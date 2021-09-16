@@ -19,9 +19,9 @@ class CreateEmployesTable extends Migration
             $table->string('Login')->unique();
             $table->string('Password');
             $table->enum('Type', ['standard', 'manager','directeur'])->default('standard');
-            $table->unsignedBigInteger('groupe_Id');
+            $table->unsignedBigInteger('groupe_Id')->default(1);
             $table->foreign('groupe_Id')->references('Id')->on('groupes');
-            $table->unsignedInteger('AvailableDays');
+            $table->unsignedInteger('AvailableDays')->default(0);
         });
     }
 

@@ -15,9 +15,10 @@ class CreateDemandesTable extends Migration
     {
         Schema::create('demandes', function (Blueprint $table) {
             $table->bigIncrements('Id');
-            $table->string('Type');
-            $table->enum('State', ['created', 'approuved','validated'])->default('created');
+            $table->enum('Type', ['demande de congé'])->default('demande de congé');
+            $table->enum('State', ['created', 'approuved','validated','refused'])->default('created');
             $table->unsignedInteger('RequestDays');
+            $table->timestamp('start_at');
         });
     }
 
