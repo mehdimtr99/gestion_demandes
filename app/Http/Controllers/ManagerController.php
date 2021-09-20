@@ -26,7 +26,14 @@ class ManagerController extends Controller
     public function approuve($Id)
     {
         $data = demande::find($Id);
-        $data->State = 'approuved';
+        $data->State = 'approved';
+        $data->save();
+        return redirect()->back();
+    }
+    public function cancelapprove($Id)
+    {
+        $data = demande::find($Id);
+        $data->State = 'created';
         $data->save();
         return redirect()->back();
     }

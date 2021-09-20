@@ -16,6 +16,7 @@ class CreateEmployesTable extends Migration
         Schema::create('employes', function (Blueprint $table) {
             $table->bigIncrements('Id');
             $table->string('FullNameEmp');
+            $table->timestamp('date_of_hiring');
             $table->string('Login')->unique();
             $table->string('Password');
             $table->enum('Type', ['standard', 'manager','directeur'])->default('standard');

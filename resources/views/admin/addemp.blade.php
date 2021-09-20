@@ -210,8 +210,8 @@
 					<span class="focus-input100"></span>
 				</div>
                 <div class="wrap-input100 validate-input" >
-					<span class="label-input100">AvailableDays</span>
-					<input style="box-shadow: none;" class="input100" type="number" min="0" required name="AvailableDays" >
+					<span class="label-input100">date d'embauche</span>
+					<input style="box-shadow: none;" class="input100" type="date"  required name="date_of_hiring" >
 					<span class="focus-input100"></span>
 				</div>
                 <div class="wrap-input100 validate-input">

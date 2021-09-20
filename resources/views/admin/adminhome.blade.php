@@ -177,7 +177,7 @@
                             <option disablade selected></option>
                             <option style='font-size:small;' value="VALIDATED"> VALIDATED</option>
                             <option style='font-size:small;' value="CREATED">CREATED</option>
-                            <option style='font-size:small;' value="APPROUVED">APPROUVED</option>
+                            <option style='font-size:small;' value="APPROVED">APPROVED</option>
                             <option style='font-size:small;' value="REFUSED">REFUSED</option>
                       </select>
                       </div>
@@ -220,7 +220,7 @@
                     <td class="align-middle text-center text-sm">
                       <span class="badge badge-sm text-white bg-gradient-success ">{{{$value->State}}}</span>
                     </td>
-                    @elseif($value->State == 'approuved')
+                    @elseif($value->State == 'approved')
                     <td class="align-middle text-center text-sm">
                       <span class="badge badge-sm text-white bg-gradient-warning">{{{$value->State}}}</span>
                     </td>
@@ -241,11 +241,11 @@
                       <span class="text-secondary text-xs font-weight-bold"><a class="text-secondary" href="{{url('/admcalendar')}}">{{date('d-m-Y', strtotime($value->start_at))}}</a></span>
                     </td>
                     <td class="align-middle text-center">
-                      <span class="text-secondary text-xs font-weight-bold"><a class="text-secondary" href="{{url('/admcalendar')}}">{{date('d-m-Y',strtotime($value->start_at)+$value->RequestDays*3600*24)}}</a></span>
+                      <span class="text-secondary text-xs font-weight-bold"><a class="text-secondary" href="{{url('/admcalendar')}}">{{date('d-m-Y',strtotime($value->start_at)+($value->RequestDays-1)*3600*24)}}</a></span>
                     </td>
 
-                    @if($value->State == 'approuved')
-                    <div class="modal fade" id="confirm-validate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    @if($value->State == 'approved')
+                    <div class="modal fade" id="{{$value->Id}}valide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                       <div class="modal-dialog">
                         <div style="width:80%;" class="modal-content">
 
@@ -269,11 +269,33 @@
                     </div>
                     <td class="align-middle">
 
-                      <a class="btn btn-link text-success text-gradient px-3 mb-0" data-toggle="modal" data-target="#confirm-validate" data-placement="top" title="valider la demande" data-original-title="validate demande"><i class="fa fa-check me-2" aria-hidden="true"></i>validate</a>
+                      <a class="btn btn-link text-success text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}valide" data-placement="top" title="valider la demande" data-original-title="validate demande"><i class="fa fa-check me-2" aria-hidden="true"></i>validate</a>
                     </td>
                     @elseif($value->State == 'validated')
+                    <div class="modal fade" id="{{$value->Id}}cvalide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div style="width:80%;" class="modal-content">
+
+                          <div class="modal-header">
+                            <button style="background-color:transparent; border:none;" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 style="font-size: 1rem" class="modal-title" id="myModalLabel">Undo</h4>
+                          </div>
+
+                          <div class="modal-body">
+                            <p>You are about to cancel the validation</p>
+                            <p>Do you want to proceed?</p>
+                            <p class="debug-url"></p>
+                          </div>
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <a href="{{url('/cancelvalidate',$value->Id)}}" class="btn btn-success btn-ok">Ok</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <td class="align-middle">
-                    <span class="mx-3 text-secondary text-xs font-weight-bold">already-validated</span>
+                      <a class="btn btn-link text-success text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}cvalide" data-placement="top" title="valider la demande" data-original-title="validate demande">validated</a>
                     </td>
                     @elseif($value->State == 'refused')
                     <td class="align-middle">
@@ -281,12 +303,12 @@
                     </td>
                     @else
                     <td class="align-middle">
-                    <span class="mx-3 text-secondary text-xs font-weight-bold">not-approuved</span>
+                    <span class="mx-3 text-secondary text-xs font-weight-bold">not-approved</span>
                     </td>
                     @endif
                   
-                  @if($value->State == 'approuved')
-                    <div class="modal fade" id="confirm-refuse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  @if($value->State == 'approved')
+                    <div class="modal fade" id="{{$value->Id}}refuse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                       <div class="modal-dialog">
                         <div style="width:80%;" class="modal-content">
 
@@ -309,19 +331,41 @@
                       </div>
                     </div>
                     <td class="align-middle">
-                      <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#confirm-refuse" data-placement="top" title="refuser la demande" data-original-title="refuse demande"><i class="fa fa-times me-2" aria-hidden="true"></i>refuse</a>
+                      <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}refuse" data-placement="top" title="refuser la demande" data-original-title="refuse demande"><i class="fa fa-times me-2" aria-hidden="true"></i>refuse</a>
                     </td>
                     @elseif($value->State == 'validated')
                     <td class="align-middle">
-                    <span class="mx-3 text-secondary text-xs font-weight-bold">already-validated</span>
+                    <span class="mx-2 text-secondary text-xs font-weight-bold">already-validated</span>
                     </td>
                     @elseif($value->State == 'refused')
+                    <div class="modal fade" id="{{$value->Id}}crefuse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div style="width:80%;" class="modal-content">
+
+                          <div class="modal-header">
+                            <button style="background-color:transparent; border:none;" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 style="font-size: 1rem" class="modal-title" id="myModalLabel">Undo</h4>
+                          </div>
+
+                          <div class="modal-body">
+                            <p>You are about to cancel the refuse</p>
+                            <p>Do you want to proceed?</p>
+                            <p class="debug-url"></p>
+                          </div>
+
+                          <div class="modal-footer">
+                            <button  type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <a href="{{url('/cancelrefuse',$value->Id)}}" class="btn btn-danger btn-ok">Ok</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <td class="align-middle">
-                    <span class="mx-3 text-secondary text-xs font-weight-bold">demande-refused</span>
+                      <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}crefuse" data-placement="top" title="refuser la demande" data-original-title="refuse demande">refused</a>
                     </td>
                     @else
                     <td class="align-middle">
-                    <span class="mx-3 text-secondary text-xs font-weight-bold">not-approuved</span>
+                    <span class="mx-2 text-secondary text-xs font-weight-bold">not-approved</span>
                     </td>
                     @endif
                   </tr>

@@ -145,7 +145,8 @@
                                                     <option disablade selected></option>
                                                     <option style='font-size:small;' value="VALIDATED"> VALIDATED</option>
                                                     <option style='font-size:small;' value="CREATED">CREATED</option>
-                                                    <option style='font-size:small;' value="APPROUVED">APPROUVED</option>
+                                                    <option style='font-size:small;' value="APPROVED">APPROVED</option>
+                                                    <option style='font-size:small;' value="REFUSED">REFUSED</option>
                                                 </select>
                                             </div>
                                         </th>
@@ -183,7 +184,7 @@
                                         <td class="align-middle text-center text-sm">
                                         <span class="badge badge-sm text-white bg-gradient-success ">{{{$value->State}}}</span>
                                         </td>
-                                        @elseif($value->State == 'approuved')
+                                        @elseif($value->State == 'approved')
                                         <td class="align-middle text-center text-sm">
                                         <span class="badge badge-sm text-white bg-gradient-warning">{{{$value->State}}}</span>
                                         </td>
@@ -205,10 +206,10 @@
                                             <span class="text-secondary text-xs font-weight-bold">{{date('d-m-Y', strtotime($value->start_at))}}</span>
                                         </td>
                                         <td class="align-middle text-center">
-                                            <span class="text-secondary text-xs font-weight-bold">{{date('d-m-Y',strtotime($value->start_at)+$value->RequestDays*3600*24)}}</span>
+                                            <span class="text-secondary text-xs font-weight-bold">{{date('d-m-Y',strtotime($value->start_at)+($value->RequestDays-1)*3600*24)}}</span>
                                         </td>
                                         @if($value->State == 'created' || $value->State == 'refused')
-                                        <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal fade" id="{{$value->Id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div style="width:80%;" class="modal-content">
 
@@ -218,7 +219,7 @@
                                                     </div>
 
                                                     <div class="modal-body">
-                                                        <p>You are about to delete one track, this procedure is irreversible.</p>
+                                                        <p>You are about to delete one track,this procedure is irreversible.</p>
                                                         <p>Do you want to proceed?</p>
                                                         <p class="debug-url"></p>
                                                     </div>
@@ -231,7 +232,7 @@
                                             </div>
                                         </div>
                                         <td class="align-middle">
-                                            <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#confirm-delete" data-placement="top" title="supprimer" data-original-title="Delete user"><i class="far fa-trash-alt me-2"></i>Delete</a>
+                                            <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}" data-placement="top" title="supprimer" data-original-title="Delete user"><i class="far fa-trash-alt me-2"></i>Delete</a>
                                         </td>
                                         @else
                                         <td class="align-middle">

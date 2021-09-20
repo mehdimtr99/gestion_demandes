@@ -158,6 +158,7 @@
                                                 <input style='font-size:small' class='px-0  w-25 h-75 ' type="text" id="sup" onkeyup="myFunction5()"  >
                                             </div> 
                                         </th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date D'embauche</th>
                                         <th class="text-secondary opacity-7"></th>
                                         <th class="text-secondary opacity-7"></th>
                                     </tr>
@@ -191,7 +192,10 @@
                                         <td class="align-middle text-center">
                                             <span class="text-secondary text-xs font-weight-bold">{{{$value->AvailableDays}}}</span>
                                         </td>
-                                        @if($value->Type != 'directeur')
+                                        <td class="align-middle text-center">
+                                            <span class="text-secondary text-xs font-weight-bold">{{date('d-m-Y', strtotime($value->date_of_hiring))}}</span>
+                                        </td>
+                                        @if($value->Type != 'directeur' && $value->Type != 'manager')
                                         <td class="align-middle">
                                             <a href="{{url('/editemp',$value->Id)}}" class="btn btn-link text-dark px-3 mb-0" data-toggle="tooltip" data-placement="top" title="modifier" data-original-title="Edit user" ><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
                                         </td>
@@ -202,18 +206,18 @@
                                             </a>
                                         </td>
                                         @endif
-                                        @if($value->Type != 'directeur')
-                                        <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        @if($value->Type != 'directeur' && $value->Type != 'manager')
+                                        <div class="modal fade" id="{{$value->Id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
-                                                <div class="modal-content">
+                                                <div style="width:80%; " class="modal-content">
 
                                                     <div class="modal-header">
-                                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                                        <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+                                                        <button style="background-color:transparent; border:none;" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                        <h4 style="font-size: 1rem" class="modal-title" id="myModalLabel">Confirm Delete</h4>
                                                     </div>
 
                                                     <div class="modal-body">
-                                                        <p>You are about to delete one track, this procedure is irreversible.</p>
+                                                    <p>You are about to delete {{$value->FullNameEmp}} {{$value->Id}} this procedure is irreversible.</p>
                                                         <p>Do you want to proceed?</p>
                                                         <p class="debug-url"></p>
                                                     </div>
@@ -227,7 +231,7 @@
                                         </div>
                                         <td class="align-middle">
                                             
-                                            <a class="btn btn-link text-danger text-gradient px-3 mb-0"data-toggle="modal"data-target="#confirm-delete" data-placement="top" title="supprimer" data-original-title="Delete user" ><i class="far fa-trash-alt me-2"></i>Delete</a>
+                                            <a class="btn btn-link text-danger text-gradient px-3 mb-0"data-toggle="modal"data-target="#{{$value->Id}}" data-placement="top" title="supprimer" data-original-title="Delete user" ><i class="far fa-trash-alt me-2"></i>Delete</a>
                                         </td>
                                         @else
                                         <td class="align-middle">

@@ -27,8 +27,11 @@ class StandardController extends Controller
         foreach($data as $value)
         {   $dmd = demande::find($value->demande_id);
             $data = Employe::find(Auth::user()->Id);
-            $data->AvailableDays = $data->AvailableDays + $dmd->RequestDays;
-            $data->save();
+            if($dmd->State != 'refused')
+            {
+                $data->AvailableDays = $data->AvailableDays + $dmd->RequestDays;
+                $data->save();
+            }
             $dmd->delete();
         }
         

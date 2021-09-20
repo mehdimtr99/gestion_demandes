@@ -114,7 +114,8 @@ class AdminController extends Controller
         if ($validator->fails()) {
             return back()->withInput()->withErrors($validator);
         }
-
+                $diff=(date_diff(date_create(), date_create($request->date_of_hiring))->format('%m') + date_diff(date_create(), date_create($request->date_of_hiring))->format('%y')*12)*1.5;
+                $diff=floor($diff);
                 $data->FullNameEmp = $request->FullNameEmp;
                 $data->Login = $request->Login;
                 if(!is_null($request->Password))
@@ -125,6 +126,8 @@ class AdminController extends Controller
                 }
                 $data->groupe_Id  = $grp[0]->Id;
                 $data->Type = $request->Type;
+                $data->date_of_hiring = $request->date_of_hiring;
+                $data->AvailableDays = $diff;
                 $data->save();
                 return redirect()->back();
 }
@@ -145,6 +148,19 @@ class AdminController extends Controller
         $data->save();
         return redirect()->back();
     }
+    public function cancelvalidm($Id)
+    {
+        $dmd = DB::table('demandesemployes')
+                    ->select('demandesemployes.*')
+                    ->where('demande_Id', '=', $Id)
+                    ->get();   
+        $data = demande::find($Id);
+        $rqs = Event::find($Id);
+        $rqs->delete();
+        $data->State = 'approved';
+        $data->save();
+        return redirect()->back();
+    }
     public function refusedm($Id)
     {   
         $dmd = DB::table('demandesemployes')
@@ -159,6 +175,28 @@ class AdminController extends Controller
         $data->save();
         return redirect()->back();
     }
+    public function cancelrefusedm($Id)
+    {   
+        $dmd = DB::table('demandesemployes')
+                    ->select('demandesemployes.*')
+                    ->where('demande_Id', '=', $Id)
+                    ->get();
+        $data = demande::find($Id);
+        $emp = Employe::find($dmd[0]->employe_id);
+        $emp->AvailableDays = $emp->AvailableDays - $data->RequestDays;
+        $emp->save();
+        if(Auth::user()->Type == 'directeur')
+        {
+            $data->State = 'approved';
+        }
+        else
+        {
+            $data->State = 'created';
+        }
+        
+        $data->save();
+        return redirect()->back();
+    }
  
     public function logout(Request $request)
     {
@@ -169,6 +207,8 @@ class AdminController extends Controller
     }
     public function insert(Request $request)
     {
+        $diff=(date_diff(date_create(), date_create($request->date_of_hiring))->format('%m') + date_diff(date_create(), date_create($request->date_of_hiring))->format('%y')*12)*1.5;
+        $diff=floor($diff);
         $grp = DB::table('groupes')
                     ->select('Id')
                     ->where('Name', '=', $request->Name)
@@ -176,8 +216,7 @@ class AdminController extends Controller
         $rules=[
             'FullNameEmp' => ['required', 'string', 'max:255'],
             'Login' => ['required', 'string', 'email', 'max:255','unique:employes'],
-            'Password' => ['required','string', 'min:8','same:password-confirmation'],
-            'AvailableDays' => ['required'],
+            'Password' => ['required','string', 'min:8','same:password-confirmation']
         ];
         $error_messages=[
             'Password.same'=>'->password are not the same password must match same value',
@@ -190,7 +229,7 @@ class AdminController extends Controller
             return back()->withInput()->withErrors($validator);
         }
 
-        DB::insert('insert into employes (FullNameEmp,Login,Password,groupe_Id,Type,AvailableDays) values (?, ?, ?, ?, ?, ?)', [$request->FullNameEmp,$request->Login,Hash::make($request->Password),$grp[0]->Id,$request->Type,$request->AvailableDays]);
+        DB::insert('insert into employes (FullNameEmp,Login,Password,groupe_Id,Type,AvailableDays,date_of_hiring) values (?, ?, ?, ?, ?, ?, ?)', [$request->FullNameEmp,$request->Login,Hash::make($request->Password),$grp[0]->Id,$request->Type,$diff,$request->date_of_hiring]);
                 return redirect()->back();
     }
     public function addemp()

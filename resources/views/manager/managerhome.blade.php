@@ -166,7 +166,7 @@
                       <select style='font-size:small;' id='etat' onchange="myFunction3()" >
                             <option disablade selected></option>
                             <option style='font-size:small;' value="validated"> validated</option>
-                            <option style='font-size:small;' value="approuved">approuved</option>
+                            <option style='font-size:small;' value="approved">approved</option>
                             <option style='font-size:small;' value="created">created</option>
                             <option style='font-size:small;' value="refused">refused</option>
                       </select>
@@ -204,7 +204,7 @@
                     <td class="align-middle text-center text-sm">
                       <span class="badge badge-sm text-white bg-gradient-success ">{{{$value->State}}}</span>
                     </td>
-                    @elseif($value->State == 'approuved')
+                    @elseif($value->State == 'approved')
                     <td class="align-middle text-center text-sm">
                       <span class="badge badge-sm text-white bg-gradient-warning">{{{$value->State}}}</span>
                     </td>
@@ -225,11 +225,11 @@
                       <span class="text-secondary text-xs font-weight-bold"><a class="text-secondary" href="{{url('/calendar')}}">{{date('d-m-Y', strtotime($value->start_at))}}</a></span>
                     </td>
                     <td class="align-middle text-center">
-                      <span class="text-secondary text-xs font-weight-bold"><a class="text-secondary" href="{{url('/calendar')}}">{{date('d-m-Y',strtotime($value->start_at)+$value->RequestDays*3600*24)}}</a></span>
+                      <span class="text-secondary text-xs font-weight-bold"><a class="text-secondary" href="{{url('/calendar')}}">{{date('d-m-Y',strtotime($value->start_at)+($value->RequestDays-1)*3600*24)}}</a></span>
                     </td>
 
                     @if($value->State == 'created')
-                    <div class="modal fade" id="confirm-approuve" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="{{$value->Id}}approve" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                       <div class="modal-dialog">
                         <div style="width:80%;" class="modal-content">
 
@@ -239,29 +239,52 @@
                           </div>
 
                           <div class="modal-body">
-                            <p>You are about to approuve demande</p>
+                            <p>You are about to approve the demande</p>
                             <p>Do you want to proceed?</p>
                             <p class="debug-url"></p>
                           </div>
 
                           <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                            <a href="{{url('/approuve',$value->Id)}}" class="btn btn-warning btn-ok">approuve</a>
+                            <a href="{{url('/approuve',$value->Id)}}" class="btn btn-warning btn-ok">approve</a>
                           </div>
                         </div>
                       </div>
                     </div>
                     <td class="align-middle">
 
-                      <a class="btn btn-link text-warning text-gradient px-3 mb-0" data-toggle="modal" data-target="#confirm-approuve" data-placement="top" title="valider la demande" data-original-title="validate demande"><i class="fa fa-check me-2" aria-hidden="true"></i>approuve</a>
+                      <a class="btn btn-link text-warning text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}approve" data-placement="top" title="approuver la demande" data-original-title="approuver demande"><i class="fa fa-check me-2" aria-hidden="true"></i>approve</a>
                     </td>
                     @elseif($value->State == 'validated')
                     <td class="align-middle">
                     <span class="mx-3 text-secondary text-xs font-weight-bold">already-validated</span>
                     </td>
-                    @elseif($value->State == 'approuved')
+                    @elseif($value->State == 'approved')
+                    <div class="modal fade" id="{{$value->Id}}capprove" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div style="width:80%;" class="modal-content">
+
+                          <div class="modal-header">
+                            <button style="background-color:transparent; border:none;" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 style="font-size: 1rem" class="modal-title" id="myModalLabel">Undo</h4>
+                          </div>
+
+                          <div class="modal-body">
+                          <p>Undo the approvement</p>
+                            <p>Do you want to proceed?</p>
+                            <p class="debug-url"></p>
+                          </div>
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <a href="{{url('/cancelapprove',$value->Id)}}" class="btn btn-warning btn-ok">Ok</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <td class="align-middle">
-                    <span class="mx-3 text-secondary text-xs font-weight-bold">already-approuved</span>
+
+                      <a class="btn btn-link text-warning text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}capprove" data-placement="top" title="valider la demande" data-original-title="validate demande">approved</a>
                     </td>
                     @else
                     <td class="align-middle">
@@ -269,7 +292,7 @@
                     </td>
                     @endif
                     @if($value->State == 'created')
-                    <div class="modal fade" id="confirm-refuse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="{{$value->Id}}refuse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                       <div class="modal-dialog">
                         <div style="width:80%;" class="modal-content">
 
@@ -292,19 +315,41 @@
                       </div>
                     </div>
                     <td class="align-middle">
-                      <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#confirm-refuse" data-placement="top" title="refuser la demande" data-original-title="refuse demande"><i class="fa fa-times me-2" aria-hidden="true"></i>refuse</a>
+                      <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}refuse" data-placement="top" title="refuser la demande" data-original-title="refuse demande"><i class="fa fa-times me-2" aria-hidden="true"></i>refuse</a>
                     </td>
                     @elseif($value->State == 'validated')
                     <td class="align-middle">
                     <span class="mx-2 text-secondary text-xs font-weight-bold">already-validated</span>
                     </td>
-                    @elseif($value->State == 'approuved')
+                    @elseif($value->State == 'approved')
                     <td class="align-middle">
-                    <span class="mx-2 text-secondary text-xs font-weight-bold">already-approuved</span>
+                    <span class="mx-2 text-secondary text-xs font-weight-bold">already-approved</span>
                     </td>
                     @else
+                    <div class="modal fade" id="{{$value->Id}}crefuse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div style="width:80%;" class="modal-content">
+
+                          <div class="modal-header">
+                            <button style="background-color:transparent; border:none;" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 style="font-size: 1rem" class="modal-title" id="myModalLabel">Undo</h4>
+                          </div>
+
+                          <div class="modal-body">
+                            <p>You are about to cancel the refuse</p>
+                            <p>Do you want to proceed?</p>
+                            <p class="debug-url"></p>
+                          </div>
+
+                          <div class="modal-footer">
+                            <button  type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <a href="{{url('/cancelrefuse',$value->Id)}}" class="btn btn-danger btn-ok">Ok</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <td class="align-middle">
-                    <span class="mx-2 text-secondary text-xs font-weight-bold">demande-refused</span>
+                      <a class="btn btn-link text-danger text-gradient px-3 mb-0" data-toggle="modal" data-target="#{{$value->Id}}crefuse" data-placement="top" title="refuser la demande" data-original-title="refuse demande">refused</a>
                     </td>
                     @endif
                   </tr>
